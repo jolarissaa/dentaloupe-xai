@@ -9,7 +9,7 @@ describe("AnamnesaForm wizard", () => {
     const user = userEvent.setup();
     render(<AnamnesaForm onComplete={vi.fn()} />);
 
-    expect(screen.getByText("Anamnesa — Sacred Seven")).toBeInTheDocument();
+    expect(screen.getByText("Anamnesa")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /^Lanjut$/ }));
 
     // on Riwayat, and nothing turned red on the way
@@ -24,8 +24,8 @@ describe("AnamnesaForm wizard", () => {
     await user.click(screen.getByRole("tab", { name: /Riwayat/ }));
     expect(await screen.findByText("Alasan kuat datang kali ini")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("tab", { name: /Sacred Seven/ }));
-    expect(await screen.findByText("Anamnesa — Sacred Seven")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: /Keluhan Utama/ }));
+    expect(await screen.findByText("Anamnesa")).toBeInTheDocument();
     expect(screen.queryByText(/wajib diisi/)).not.toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe("AnamnesaForm wizard", () => {
 
     expect(await screen.findByText("Lokasi keluhan wajib diisi")).toBeInTheDocument();
     expect(screen.getByText("Kualitas nyeri wajib diisi")).toBeInTheDocument();
-    expect(screen.getByText("Anamnesa — Sacred Seven")).toBeInTheDocument();
+    expect(screen.getByText("Anamnesa")).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -91,7 +91,7 @@ describe("AnamnesaForm wizard", () => {
     expect(await screen.findByText("Alasan kuat datang kali ini")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /Kembali/ }));
-    expect(await screen.findByText("Anamnesa — Sacred Seven")).toBeInTheDocument();
+    expect(await screen.findByText("Anamnesa")).toBeInTheDocument();
   });
 
   it("starts from pre-filled answers and submits them untouched", async () => {

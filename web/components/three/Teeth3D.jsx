@@ -219,7 +219,7 @@ export default function Teeth3D({ detections, archMode = "upper", selected, onSe
     <div className="relative h-full w-full">
       {onProgress ? <ProgressReporter onProgress={onProgress} /> : null}
       <Canvas shadows camera={{ position: [0, 0.5, 7], fov: 42 }} dpr={[1, 2]}>
-        <color attach="background" args={["#0e1116"]} />
+        <color attach="background" args={["#0A1A2F"]} />
         <hemisphereLight args={[0xffffff, 0x35404f, 0.9]} />
         <ambientLight intensity={0.35} />
         <directionalLight position={[4, 8, 6]} intensity={1.15} castShadow />
@@ -254,7 +254,7 @@ export default function Teeth3D({ detections, archMode = "upper", selected, onSe
           (showGum ? "bg-[#d46b72] text-white" : "bg-black/60 text-white hover:bg-black/70")
         }
       >
-        {showGum ? "Gusi: Aktif" : "Gusi: Nonaktif"}
+        {showGum ? "Sembunyikan Gusi" : "Tampilkan Gusi"}
       </button>
     </div>
   );

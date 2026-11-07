@@ -10,7 +10,7 @@ export const PIPELINE_STEPS = [
   { key: "prepare", label: "Menyiapkan & memvalidasi gambar", until: 10 },
   { key: "detect", label: "Deteksi FDI & segmentasi gigi", until: 30 },
   { key: "grade", label: "Grading karies ICDAS", until: 50 },
-  { key: "panoramic", label: "Analisis panoramik — karies tersembunyi", until: 70 },
+  { key: "panoramic", label: "Analisis panoramik — lesi internal", until: 70 },
   { key: "fuse", label: "Fusi temuan & rekonstruksi 3D", until: 88 },
   { key: "advisory", label: "Menyusun diagnosis & rencana perawatan", until: 100 },
 ];

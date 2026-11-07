@@ -99,7 +99,7 @@ export default function CariesSummary({ detections, onSelect, selected }) {
                 </p>
                 {a.hidden && (
                   <span className="mt-1.5 inline-block rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
-                    🩻 tersembunyi
+                    🩻 Perlu foto periapikal
                   </span>
                 )}
               </button>
@@ -107,6 +107,16 @@ export default function CariesSummary({ detections, onSelect, selected }) {
           </div>
         )}
       </div>
+
+      {s.hidden.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3.5" data-testid="periapical-notice">
+          <p className="text-sm font-medium text-amber-900">Perlu pemeriksaan lanjutan</p>
+          <p className="mt-1 text-xs leading-relaxed text-amber-800">
+            Lesi internal terlihat pada X-ray di gigi <b>{s.hidden.join(", ")}</b>, sedangkan permukaannya tampak sehat.
+            Disarankan foto periapikal / pemeriksaan lanjutan untuk memastikan.
+          </p>
+        </div>
+      )}
 
       {missing.length > 0 && (
         <div className="rounded-2xl border border-dashed bg-muted/40 p-3.5">

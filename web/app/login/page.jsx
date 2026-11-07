@@ -94,11 +94,12 @@ export default function LoginPage() {
 
       <div className="relative my-auto w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
+          <p className="mb-4 text-sm font-bold tracking-[0.35em] text-primary">NAIA</p>
           <div className="tf-float">
-            <LogoMark animated className="h-16 w-16 drop-shadow-[0_10px_24px_rgba(37,99,235,0.28)]" />
+            <LogoMark animated className="h-16 w-16 drop-shadow-[0_10px_24px_rgba(15,47,87,0.28)]" />
           </div>
           <h1 className="mt-5 text-2xl font-semibold tracking-tight animate-rise" style={{ "--i": 3 }}>
-            Masuk ke Tooth<span className="text-primary">Fairy</span>
+            Masuk ke Dentaloupe<span className="text-[hsl(var(--brand-green))]">-XAI</span>
           </h1>
           <p className="mt-1.5 max-w-[17rem] text-sm text-muted-foreground animate-rise" style={{ "--i": 4 }}>
             Deteksi karies &amp; rekonstruksi gigi 3D untuk dokter gigi

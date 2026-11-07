@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🦷 ToothFairy
+# 🦷 Dentaloupe-XAI
 
 **Deteksi karies anak dan rekonstruksi gigi 3D interaktif dari citra intraoral & panoramik.**
 

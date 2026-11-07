@@ -24,7 +24,7 @@
 .toggle { display: flex; align-items: center; gap: 9px; font-size: 13px;
   padding: 9px 11px; background: rgba(42,108,255,.12); border: 1px solid rgba(42,108,255,.3);
   border-radius: 10px; cursor: pointer; }
-.toggle input { accent-color: #2a6cff; width: 15px; height: 15px; }
+.toggle input { accent-color: #0A7A5E; width: 15px; height: 15px; }
 
 .seg { display: flex; gap: 4px; margin-top: 10px; background: rgba(255,255,255,.04);
   padding: 4px; border-radius: 10px; }
@@ -89,7 +89,7 @@
   background: #11151c; border: 1px solid rgba(255,255,255,.06); }
 .exslider { padding: 14px 18px 4px; }
 .exslider label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #8aa0bd; }
-.exslider input[type=range] { width: 100%; margin-top: 8px; accent-color: #2a6cff; height: 20px; }
+.exslider input[type=range] { width: 100%; margin-top: 8px; accent-color: #0A7A5E; height: 20px; }
 .exhint { font-size: 11px; color: #7f8da3; margin-top: 4px; }
 .exlegend { padding: 6px 18px 18px; display: grid; gap: 6px; }
 .exrow { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 10px;

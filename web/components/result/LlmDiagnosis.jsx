@@ -8,10 +8,10 @@ export default function LlmDiagnosis({ markdown, sanity, focus, onShowTooth, gra
   return (
     <ClinicalReport
       kind="diagnosis"
-      title="Diagnosis"
+      title="Diagnosis Awal"
       icon={Stethoscope}
       markdown={markdown}
-      emptyText="Diagnosis belum tersedia."
+      emptyText="Diagnosis awal belum tersedia."
       sanity={sanity}
       focus={focus}
       onShowTooth={onShowTooth}

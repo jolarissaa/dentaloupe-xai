@@ -168,7 +168,7 @@ export default function ClinicalReport({
                       className={cn(
                         "flex shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200",
                         on
-                          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_14px_-6px_rgba(37,99,235,0.7)]"
+                          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_14px_-6px_rgba(15,47,87,0.7)]"
                           : "bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground"
                       )}
                     >

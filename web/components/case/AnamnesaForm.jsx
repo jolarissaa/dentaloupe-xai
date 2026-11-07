@@ -23,7 +23,7 @@ const opt = z.string().optional().default("");
 
 const schema = z.object({
   patient_name: z.string().optional().default(""),
-  // Sacred Seven
+  // Keluhan utama
   lokasi: req("Lokasi keluhan wajib diisi"),
   quality: req("Kualitas nyeri wajib diisi"),
   severity: opt,
@@ -42,8 +42,8 @@ const schema = z.object({
 
 const STEPS = [
   {
-    title: "Anamnesa — Sacred Seven",
-    short: "Sacred Seven",
+    title: "Anamnesa",
+    short: "Keluhan Utama",
     blurb: "Tujuh pertanyaan inti tentang keluhan utama pasien.",
     fields: [
       { name: "patient_name", label: "Nama Pasien (opsional)", input: true, placeholder: "Nama anak" },

@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => {
 
 test("sign-in is pre-filled in demo mode", async ({ page }) => {
   await page.goto("/login");
-  await expect(page.getByLabel("Email")).toHaveValue("dokter@toothfairy.id");
+  await expect(page.getByLabel("Email")).toHaveValue("dokter@dentaloupe.id");
   await page.getByRole("button", { name: "Masuk" }).click();
   await expect(page.getByRole("link", { name: /Kasus Baru/i })).toBeVisible();
 });

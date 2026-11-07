@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 
+import { overlayDesc, overlayTitle } from "@/lib/overlayLabels";
+
 /**
  * Per-model detection overlays + XAI attention maps as a horizontal slider.
  * `base` is the selected dataset's public dir (e.g. "/results/set1/"); overlay `src`s
@@ -25,6 +27,8 @@ export default function ModelGallery({
         setItems(
           list.map((it) => ({
             ...it,
+            title: overlayTitle(it.title),
+            desc: overlayDesc(it.desc),
             src:
               it.src?.startsWith("http") || it.src?.startsWith("/")
                 ? it.src
@@ -62,7 +66,7 @@ export default function ModelGallery({
               <p className="truncate text-[11px] text-muted-foreground">{it.desc}</p>
               {i === firstXaiIdx && firstXaiIdx >= 0 && (
                 <span className="mt-1 inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
-                  attention map
+                  peta atensi
                 </span>
               )}
             </div>
@@ -146,7 +150,7 @@ function Lightbox({ item, onClose, onPrev, onNext, hasPrev, hasNext }) {
         <button className="rounded bg-white/10 px-2" onClick={() => setT((p) => ({ ...p, s: Math.max(1, p.s / 1.3) }))}>−</button>
         <span>{Math.round(t.s * 100)}%</span>
         <button className="rounded bg-white/10 px-2" onClick={() => setT((p) => ({ ...p, s: Math.min(8, p.s * 1.3) }))}>+</button>
-        <button className="rounded bg-white/10 px-2" onClick={() => setT({ s: 1, x: 0, y: 0 })}>reset</button>
+        <button className="rounded bg-white/10 px-2" onClick={() => setT({ s: 1, x: 0, y: 0 })}>atur ulang</button>
       </div>
       {hasPrev && <button aria-label="Sebelumnya" className="absolute left-4 top-1/2 text-3xl text-white" onClick={(e) => { e.stopPropagation(); onPrev(); }}>‹</button>}
       {hasNext && <button aria-label="Berikutnya" className="absolute right-4 top-1/2 text-3xl text-white" onClick={(e) => { e.stopPropagation(); onNext(); }}>›</button>}

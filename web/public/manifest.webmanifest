@@ -1,6 +1,6 @@
 {
-  "name": "ToothFairy · Deteksi Karies & Rekonstruksi 3D",
-  "short_name": "ToothFairy",
+  "name": "Dentaloupe-XAI · Deteksi Karies & Rekonstruksi 3D",
+  "short_name": "Dentaloupe-XAI",
   "description": "Deteksi karies anak dan rekonstruksi gigi 3D interaktif dari citra intraoral & panoramik",
   "lang": "id",
   "dir": "ltr",
@@ -9,7 +9,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "theme_color": "#0F2F57",
   "categories": ["medical", "health"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

@@ -32,7 +32,7 @@ const CITED_MD = [
 describe("LLM cards", () => {
   it("renders the document heading and its intro markdown", () => {
     render(<LlmDiagnosis markdown={MD} />);
-    expect(screen.getByRole("heading", { name: "Diagnosis" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Diagnosis Awal" })).toBeInTheDocument();
     expect(screen.getByText("Gigi 11 D6")).toBeInTheDocument();
   });
 

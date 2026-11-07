@@ -50,7 +50,7 @@ function DoctorHome() {
 
       <Link
         href="/case/new"
-        className="group relative mb-9 flex items-center gap-4 overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-[0_12px_32px_-12px_rgba(37,99,235,0.6)] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 animate-rise"
+        className="group relative mb-9 flex items-center gap-4 overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-[0_12px_32px_-12px_rgba(15,47,87,0.6)] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 animate-rise"
         style={{ "--i": 2 }}
       >
         {/* quiet depth: two offset rings in the corner */}

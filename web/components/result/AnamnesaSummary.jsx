@@ -1,11 +1,11 @@
 "use client";
 /**
- * Read-only display of the case's anamnesa answers (Sacred Seven + Riwayat).
+ * Read-only display of the case's anamnesa answers (keluhan utama + riwayat).
  * Labels mirror `case/AnamnesaForm.jsx` so the doctor sees exactly what was entered.
  */
 const GROUPS = [
   {
-    title: "Anamnesa — Sacred Seven",
+    title: "Anamnesa",
     fields: [
       ["lokasi", "Lokasi keluhan"],
       ["quality", "Kualitas nyeri"],

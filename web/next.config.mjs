@@ -17,7 +17,7 @@ const withPWA = withPWAInit({
         urlPattern: /\/results\/.*\.(?:json|jpg|jpeg|png|webp|glb)$/i,
         handler: "CacheFirst",
         options: {
-          cacheName: "toothfairy-results",
+          cacheName: "dentaloupe-results",
           expiration: { maxEntries: 300, maxAgeSeconds: 30 * 24 * 60 * 60 },
         },
       },
@@ -25,14 +25,14 @@ const withPWA = withPWAInit({
         urlPattern: /\.(?:glb|gltf)$/i,
         handler: "CacheFirst",
         options: {
-          cacheName: "toothfairy-models",
+          cacheName: "dentaloupe-models",
           expiration: { maxEntries: 40, maxAgeSeconds: 30 * 24 * 60 * 60 },
         },
       },
       {
         urlPattern: ({ url }) => url.pathname.startsWith("/cases") || url.pathname.startsWith("/auth"),
         handler: "NetworkFirst",
-        options: { cacheName: "toothfairy-api", networkTimeoutSeconds: 10 },
+        options: { cacheName: "dentaloupe-api", networkTimeoutSeconds: 10 },
       },
       {
         // Patient photos are never written to the offline cache: an installed PWA on a

@@ -16,7 +16,7 @@ export const STANDALONE =
 export const DEMO_MODE = STANDALONE;
 
 /** The seeded doctor account (valid against the real gateway's seed too). */
-export const DEMO_CREDENTIALS = { email: "dokter@toothfairy.id", password: "doctor123" };
+export const DEMO_CREDENTIALS = { email: "dokter@dentaloupe.id", password: "doctor123" };
 
 /** The bundled dataset the demo patient's photos and results come from. */
 export const DEMO_DATASET = "set3";

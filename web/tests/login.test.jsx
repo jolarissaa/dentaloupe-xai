@@ -38,12 +38,12 @@ describe("LoginPage", () => {
     const user = userEvent.setup();
     render(<LoginPage />);
 
-    await user.type(screen.getByLabelText("Email"), "admin@toothfairy.com");
+    await user.type(screen.getByLabelText("Email"), "admin@dentaloupe.id");
     await user.type(screen.getByLabelText("Kata Sandi"), "admin123");
     await user.click(screen.getByRole("button", { name: "Masuk" }));
 
     await waitFor(() =>
-      expect(loginMock).toHaveBeenCalledWith("admin@toothfairy.com", "admin123")
+      expect(loginMock).toHaveBeenCalledWith("admin@dentaloupe.id", "admin123")
     );
     await waitFor(() => expect(replace).toHaveBeenCalledWith("/admin"));
   });

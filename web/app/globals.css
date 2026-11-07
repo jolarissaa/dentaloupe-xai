@@ -2,38 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* shadcn/ui design tokens — clean white light theme (Poppins). A dark palette is kept for
+/* Dentaloupe-XAI palette (Poppins). Navy = the clinical precision of the instrument; green = the
+   lens, what the loupe brings into focus; cool mist neutrals keep it calm. ICDAS grade colours
+   live in lib/damage.js and are clinical coding, not branding. A dark palette is kept for
    completeness but the app is light-first. The legacy 3D viewer keeps its own dark styles in
    styles/viewer.css (scoped to .wrap). */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 8%;
+    --background: 200 33% 98%;          /* mist #F8FAFB */
+    --foreground: 214 50% 12%;          /* ink #0F1D2E */
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 8%;
+    --card-foreground: 214 50% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 8%;
+    --popover-foreground: 214 50% 12%;
 
-    --primary: 221 83% 53%;            /* clinical blue */
+    --primary: 213 71% 20%;            /* loupe navy #0F2F57 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 12%;
+    --secondary: 205 30% 95%;
+    --secondary-foreground: 214 50% 12%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
+    --muted: 205 30% 95%;
+    --muted-foreground: 212 16% 38%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 240 6% 12%;
+    --accent: 163 45% 94%;
+    --accent-foreground: 214 50% 12%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 221 83% 53%;
+    --border: 207 24% 88%;
+    --input: 207 24% 88%;
+    --ring: 164 85% 26%;
+    --brand-green: 164 85% 26%;        /* lens green #0A7A5E, passes AA on white as text */
 
     --radius: 0.9rem;
   }
@@ -45,7 +48,7 @@
     --card-foreground: 0 0% 96%;
     --popover: 240 9% 9%;
     --popover-foreground: 0 0% 96%;
-    --primary: 221 83% 60%;
+    --primary: 205 70% 62%;
     --primary-foreground: 240 10% 6%;
     --secondary: 240 4% 16%;
     --secondary-foreground: 0 0% 96%;
@@ -57,7 +60,8 @@
     --destructive-foreground: 0 0% 96%;
     --border: 240 4% 18%;
     --input: 240 4% 18%;
-    --ring: 221 83% 60%;
+    --ring: 205 70% 62%;
+    --brand-green: 162 65% 54%;
   }
 }
 
@@ -121,9 +125,9 @@
 
 /* ---------------------------------------------------------------------------------------
    Brand mark (components/brand/Logo.jsx). Static by default; `.tf-logo--animated` draws the
-   tooth in, fills it, then twinkles the sparkle. Plain CSS (not utilities) because the SVG
+   tooth in, fills it, then pops the lens in. Plain CSS (not utilities) because the SVG
    parts are addressed by class. */
-.tf-logo-spark,
+.tf-logo-lens,
 .tf-logo-tooth {
   transform-box: fill-box;
   transform-origin: center;
@@ -139,13 +143,8 @@
     tf-draw 0.9s 0.15s ease-out backwards,
     tf-fill 0.45s 0.85s ease-out backwards;
 }
-.tf-logo--animated .tf-logo-shine {
-  animation: tf-fade 0.4s 1.1s ease-out backwards;
-}
-.tf-logo--animated .tf-logo-spark {
-  animation:
-    tf-pop 0.5s 1.15s cubic-bezier(0.2, 0.9, 0.3, 1.4) backwards,
-    tf-twinkle 3.6s 2s ease-in-out infinite;
+.tf-logo--animated .tf-logo-lens {
+  animation: tf-pop 0.5s 1.05s cubic-bezier(0.2, 0.9, 0.3, 1.4) backwards;
 }
 .tf-float {
   animation: tf-float 6s ease-in-out infinite;
@@ -162,15 +161,6 @@
 @keyframes tf-fill {
   from { fill-opacity: 0; }
   to { fill-opacity: 1; }
-}
-@keyframes tf-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes tf-twinkle {
-  0%, 70%, 100% { transform: scale(1) rotate(0deg); }
-  78% { transform: scale(1.35) rotate(45deg); }
-  86% { transform: scale(0.85) rotate(90deg); }
 }
 @keyframes tf-float {
   0%, 100% { transform: translateY(0); }

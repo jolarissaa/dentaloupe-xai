@@ -37,6 +37,6 @@ describe("CariesSummary", () => {
 
   it("marks hidden lesions", () => {
     render(<CariesSummary detections={DET} />);
-    expect(screen.getByText(/tersembunyi/)).toBeInTheDocument();
+    expect(screen.getByText(/Perlu foto periapikal/)).toBeInTheDocument();
   });
 });

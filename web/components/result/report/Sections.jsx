@@ -143,7 +143,7 @@ export function ToothTable({ kind, data, openFdi, setOpenFdi, onShowTooth }) {
                 id={`${kind}-tooth-${fdi}`}
                 className={cn(
                   "scroll-mt-40 overflow-hidden rounded-2xl border bg-card transition-all duration-300 animate-rise",
-                  open ? "border-primary/30 shadow-[0_8px_24px_-14px_rgba(37,99,235,0.45)]" : "hover:border-primary/20",
+                  open ? "border-primary/30 shadow-[0_8px_24px_-14px_rgba(15,47,87,0.45)]" : "hover:border-primary/20",
                   openFdi === fdi && "ring-2 ring-primary/30"
                 )}
                 style={{ "--i": Math.min(ri, 10) }}

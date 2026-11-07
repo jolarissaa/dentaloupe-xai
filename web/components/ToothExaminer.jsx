@@ -3,13 +3,15 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { ICDAS_LABEL, applyDamageLayered } from "../lib/damage";
+import { applyDamageLayered } from "../lib/damage";
+import { ICDAS_LABEL_ID } from "../lib/caries";
 
-/* Layer metadata. `reach` = the max ICDAS grade whose caries stops in this layer. */
+/* Layer metadata. `name` must match the mesh names inside the GLB files; `label` is what the
+   doctor sees. `reach` = the max ICDAS grade whose caries stops in this layer. */
 const LAYERS = [
-  { name: "Enamel",  color: "#f1eddd", reach: 2, blurb: "Hard outer shell" },
-  { name: "Dentine", color: "#e6ca7e", reach: 4, blurb: "Softer middle layer" },
-  { name: "Pulp",    color: "#c72e33", reach: 6, blurb: "Nerve & blood supply" },
+  { name: "Enamel",  label: "Enamel", color: "#f1eddd", reach: 2, blurb: "Lapisan luar yang keras" },
+  { name: "Dentine", label: "Dentin", color: "#e6ca7e", reach: 4, blurb: "Lapisan tengah yang lebih lunak" },
+  { name: "Pulp",    label: "Pulpa",  color: "#c72e33", reach: 6, blurb: "Saraf & pembuluh darah" },
 ];
 const CAP_OFFSET = [0.001, 0.004, 0.008]; // tiny +X stagger so caps stack concentrically
 
@@ -181,9 +183,9 @@ export default function ToothExaminer({ tooth, onClose }) {
         <button className="exclose" onClick={onClose}>✕</button>
         <div className="exhead">
           <div className="extitle">
-            <span className="exeyebrow">Cross-section · Tooth {tooth.fdi}{tooth.hidden ? " · 🩻 hidden lesion" : ""}</span>
-            <h2 className="exh2">{grade ? `ICDAS D${grade} — ${ICDAS_LABEL[grade]}` : "Healthy tooth"}</h2>
-            {tooth.hidden ? <span className="exeyebrow">Surface looks sound — a focal internal cavity found on the panoramic X-ray</span> : null}
+            <span className="exeyebrow">Tampilan Sagital · Gigi {tooth.fdi}{tooth.hidden ? " · 🩻 lesi internal" : ""}</span>
+            <h2 className="exh2">{grade ? `ICDAS D${grade} — ${ICDAS_LABEL_ID[grade]}` : "Gigi sehat"}</h2>
+            {tooth.hidden ? <span className="exeyebrow">Permukaan tampak sehat, lesi internal terlihat pada X-ray panoramik. Perlu foto periapikal / pemeriksaan lanjutan.</span> : null}
           </div>
         </div>
 
@@ -193,7 +195,7 @@ export default function ToothExaminer({ tooth, onClose }) {
             gl={{ localClippingEnabled: true, stencil: true, antialias: true }}
             dpr={[1, 2]}
           >
-            <color attach="background" args={["#11151c"]} />
+            <color attach="background" args={["#0A1A2F"]} />
             <hemisphereLight args={[0xffffff, 0x2a323d, 1.0]} />
             <ambientLight intensity={0.4} />
             <directionalLight position={[5, 6, 5]} intensity={1.2} />
@@ -206,13 +208,13 @@ export default function ToothExaminer({ tooth, onClose }) {
         </div>
 
         <div className="exslider">
-          <label>Cross-section sweep</label>
+          <label>Geser irisan</label>
           <input
             type="range" min={-range} max={range} step={range / 220}
             value={Math.max(-range, Math.min(range, clip))}
             onChange={(e) => setClip(parseFloat(e.target.value))}
           />
-          <div className="exhint">Drag to slice the tooth open · drag the model to rotate</div>
+          <div className="exhint">Geser untuk mengiris gigi · seret model untuk memutar. Gambar ini merupakan simulasi berdasarkan hasil deteksi AI, bukan gambar klinis sebenarnya.</div>
         </div>
 
         <div className="exlegend">
@@ -222,11 +224,11 @@ export default function ToothExaminer({ tooth, onClose }) {
               <div className={"exrow" + (i === li ? " hit" : "")} key={L.name}>
                 <span className="exsw" style={{ background: L.color }} />
                 <div className="exmeta">
-                  <b>{L.name}</b>
+                  <b>{L.label}</b>
                   <span>{L.blurb}</span>
                 </div>
                 <span className={"exbadge" + (reached ? " on" : "")}>
-                  {i === li ? "caries reaches here" : reached ? "penetrated" : "intact"}
+                  {i === li ? "karies sampai di sini" : reached ? "tertembus" : "utuh"}
                 </span>
               </div>
             );

@@ -2,7 +2,7 @@ import * as standalone from "@/lib/standalone";
 import { STANDALONE } from "@/lib/demo";
 
 /**
- * Thin fetch wrapper for the ToothFairy API gateway.
+ * Thin fetch wrapper for the Dentaloupe-XAI API gateway.
  *
  * The gateway (Go) is the only backend the browser talks to; it owns identity and case
  * records and forwards the expensive work to the Python ML service internally.
@@ -15,7 +15,7 @@ export const API_BASE =
 /**
  * Standalone mode: serve the API from the browser instead of the network.
  *
- * ToothFairy is an installable PWA used on clinic tablets, so it has to stay usable when the
+ * Dentaloupe-XAI is an installable PWA used on clinic tablets, so it has to stay usable when the
  * gateway is unreachable. With this on, `lib/standalone.js` answers the same routes from
  * local storage and the bundled analysis datasets; requests it does not implement still fall
  * through to the network. Set `NEXT_PUBLIC_STANDALONE=0` to always use the gateway (the flag

@@ -33,7 +33,7 @@ const ToothExaminer = dynamic(() => import("@/components/ToothExaminer"), { ssr:
 const NAV = [
   { id: "model", label: "Model 3D", icon: Box },
   { id: "ringkasan", label: "Ringkasan", icon: ChartColumn },
-  { id: "diagnosis", label: "Diagnosis", icon: Stethoscope },
+  { id: "diagnosis", label: "Diagnosis Awal", icon: Stethoscope },
   { id: "perawatan", label: "Perawatan", icon: ClipboardList },
   { id: "foto", label: "Foto & AI", icon: Images },
   { id: "anamnesa", label: "Anamnesa", icon: MessageSquareText },
@@ -165,7 +165,7 @@ function ToothPanel({ tooth, onClose, onExamine, onJump }) {
           </p>
           <p className="text-xs text-muted-foreground">{tooth.severity ? ICDAS_LABEL_ID[tooth.severity] : "Tidak ada karies terdeteksi"}</p>
           {tooth.hidden && (
-            <p className="mt-1 text-xs text-amber-700">🩻 Lesi internal (X-ray) — permukaan tampak sehat.</p>
+            <p className="mt-1 text-xs text-amber-700">🩻 Lesi internal (X-ray), permukaan tampak sehat. Perlu foto periapikal / pemeriksaan lanjutan.</p>
           )}
         </div>
         <button type="button" onClick={onClose} aria-label="Tutup detail gigi" className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
@@ -173,13 +173,13 @@ function ToothPanel({ tooth, onClose, onExamine, onJump }) {
         </button>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <button type="button" onClick={onExamine} aria-label={`Belah gigi ${tooth.fdi}`} className="flex flex-col items-center gap-1 rounded-xl bg-muted/60 px-2 py-2.5 text-[11px] font-medium transition-colors hover:bg-primary/10 hover:text-primary">
+        <button type="button" onClick={onExamine} aria-label={`Tampilan sagital gigi ${tooth.fdi}`} className="flex flex-col items-center gap-1 rounded-xl bg-muted/60 px-2 py-2.5 text-[11px] font-medium transition-colors hover:bg-primary/10 hover:text-primary">
           <Microscope className="h-4 w-4" />
-          Belah gigi
+          Tampilan Sagital
         </button>
-        <button type="button" onClick={() => onJump("diagnosis")} aria-label={`Diagnosis gigi ${tooth.fdi}`} className="flex flex-col items-center gap-1 rounded-xl bg-muted/60 px-2 py-2.5 text-[11px] font-medium transition-colors hover:bg-primary/10 hover:text-primary">
+        <button type="button" onClick={() => onJump("diagnosis")} aria-label={`Diagnosis awal gigi ${tooth.fdi}`} className="flex flex-col items-center gap-1 rounded-xl bg-muted/60 px-2 py-2.5 text-[11px] font-medium transition-colors hover:bg-primary/10 hover:text-primary">
           <Stethoscope className="h-4 w-4" />
-          Diagnosis
+          Diagnosis Awal
         </button>
         <button type="button" onClick={() => onJump("recommendation")} aria-label={`Rencana gigi ${tooth.fdi}`} className="flex flex-col items-center gap-1 rounded-xl bg-muted/60 px-2 py-2.5 text-[11px] font-medium transition-colors hover:bg-primary/10 hover:text-primary">
           <ClipboardList className="h-4 w-4" />
@@ -286,7 +286,7 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
       <main className="mx-auto max-w-3xl px-4 pb-16 pt-4 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start lg:gap-8">
         {/* 3D — sticky beside the report on wide screens */}
         <section id="model" aria-label="Model 3D" className="scroll-mt-32 space-y-3 lg:sticky lg:top-[132px]">
-          <div className="relative overflow-hidden rounded-3xl border bg-[#0e1116] shadow-[0_20px_50px_-24px_rgba(15,23,42,0.6)] animate-fade-in">
+          <div className="relative overflow-hidden rounded-3xl border bg-[#0A1A2F] shadow-[0_20px_50px_-24px_rgba(15,23,42,0.6)] animate-fade-in">
             <div className="h-[52vh] min-h-[320px] w-full lg:h-[calc(100dvh-330px)] lg:min-h-[380px]">
               <Teeth3D
                 detections={detections}
@@ -301,6 +301,9 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
               <ArchTabs value={archMode} onChange={setArchMode} overlay className="pointer-events-auto w-full max-w-xs" />
             </div>
           </div>
+          <p className="px-1 text-center text-[11px] leading-snug text-muted-foreground">
+            Gambar ini merupakan simulasi berdasarkan hasil deteksi AI, bukan gambar klinis sebenarnya.
+          </p>
           <ToothPanel
             tooth={sel}
             onClose={() => setSelected(null)}
@@ -317,7 +320,7 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
             </Reveal>
           </section>
 
-          <section id="diagnosis" className="scroll-mt-32" aria-label="Diagnosis">
+          <section id="diagnosis" className="scroll-mt-32" aria-label="Diagnosis Awal">
             <Reveal>
               <LlmDiagnosis
                 markdown={caseData.diagnosis_md}

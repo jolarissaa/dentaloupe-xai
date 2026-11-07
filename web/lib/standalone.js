@@ -1,7 +1,7 @@
 /**
  * Standalone mode — the app running with no backend reachable.
  *
- * ToothFairy ships as an installable PWA that clinics use on tablets and phones, often on
+ * Dentaloupe-XAI ships as an installable PWA that clinics use on tablets and phones, often on
  * poor connectivity. This module lets the whole product be exercised from the browser alone:
  * it implements the same routes `lib/api.js` would call over HTTP, backed by `localStorage`,
  * and resolves results against the analysis datasets bundled in `public/results/`.

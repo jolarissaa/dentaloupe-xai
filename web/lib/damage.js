@@ -12,11 +12,6 @@ export const ICDAS_COLORS = [
   "#241610", // D6 extensive cavity, gross destruction
 ];
 
-export const ICDAS_LABEL = [
-  "Healthy", "D1 · initial", "D2 · distinct", "D3 · enamel breakdown",
-  "D4 · dentine shadow", "D5 · distinct cavity", "D6 · extensive cavity",
-];
-
 // how deep (fraction of crown height) and wide (fraction of crown width) the
 // lesion eats, per ICDAS grade.
 const DEPTH_FRAC = [0, 0.05, 0.12, 0.24, 0.40, 0.58, 0.78];
