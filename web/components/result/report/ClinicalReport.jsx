@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, Rows3, ShieldCheck, SquareStack } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Database, Rows3, ShieldCheck, SquareStack } from "lucide-react";
 
 import { parseReport, sectionForTooth } from "@/lib/report";
 import { cn } from "@/lib/utils";
 import { CitationProvider, Md } from "./Citations";
 import { AlertSection, SourceList, ToothNotes, ToothTable, VisitTimeline } from "./Sections";
+import { TriagePyramid } from "./Triage";
 
 function SectionBody({ section, sources, kind, openFdi, setOpenFdi, onShowTooth, grades }) {
   switch (section.kind) {
@@ -21,6 +22,8 @@ function SectionBody({ section, sources, kind, openFdi, setOpenFdi, onShowTooth,
       return <ToothNotes kind={kind} data={section.data} openFdi={openFdi} onShowTooth={onShowTooth} grades={grades} />;
     case "visits":
       return <VisitTimeline data={section.data} />;
+    case "triage":
+      return <TriagePyramid data={section.data} onShowTooth={onShowTooth} />;
     case "alert":
       return <AlertSection body={section.body} />;
     case "sources":
@@ -42,6 +45,9 @@ function SectionBody({ section, sources, kind, openFdi, setOpenFdi, onShowTooth,
  * foot — so a 20k-character document reads as a sequence of short screens instead of one wall.
  * "Semua" lays every section out in order for reading straight through. Nothing is condensed.
  *
+ * Sources are metadata: the "Rujukan" section, the citation chips and the verification badge stay
+ * hidden until "Tampilkan Metadata" is on. Nothing is removed from the document.
+ *
  * `focus` ({ doc, fdi, nonce }) lets the page jump here from a tooth picked on the 3D model:
  * the section holding that tooth opens, its card expands, and it scrolls into view.
  */
@@ -60,10 +66,15 @@ export default function ClinicalReport({
   const [active, setActive] = useState(0);
   const [mode, setMode] = useState("paged");
   const [openFdi, setOpenFdi] = useState(null);
+  const [showMeta, setShowMeta] = useState(false);
   const rootRef = useRef(null);
   const railRef = useRef(null);
 
-  const sections = report.sections;
+  const sections = useMemo(
+    () => report.sections.filter((s) => showMeta || s.kind !== "sources"),
+    [report, showMeta]
+  );
+  const hasMeta = report.sources.length > 0 || sections.length !== report.sections.length;
   const total = sections.length;
   const current = sections[Math.min(active, Math.max(total - 1, 0))];
   const verified = useMemo(() => /(\d+)\s+dari\s+(\d+)\s+kutipan\s+terverifikasi/i.exec(sanity || ""), [sanity]);
@@ -79,7 +90,8 @@ export default function ClinicalReport({
   // Jump to a tooth picked elsewhere on the page.
   useEffect(() => {
     if (!focus || focus.doc !== kind) return;
-    const idx = sectionForTooth(report, focus.fdi);
+    const at = sectionForTooth(report, focus.fdi);
+    const idx = at >= 0 ? sections.findIndex((s) => s.id === report.sections[at].id) : -1;
     if (idx >= 0) {
       setMode("paged");
       setActive(idx);
@@ -90,6 +102,7 @@ export default function ClinicalReport({
       target?.scrollIntoView?.({ behavior: "smooth", block: idx >= 0 ? "center" : "start" });
     }, 80);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only a new focus request should jump
   }, [focus, kind, report]);
 
   function go(i) {
@@ -109,17 +122,33 @@ export default function ClinicalReport({
           <h2 className="text-lg font-semibold leading-tight tracking-tight">{title}</h2>
           {total > 0 && (
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {total} bagian{report.sources.length ? ` · ${report.sources.length} rujukan` : ""}
+              {total} bagian{showMeta && report.sources.length ? ` · ${report.sources.length} rujukan` : ""}
             </p>
           )}
         </div>
       </div>
-      {verified && (
+      <div className="flex flex-wrap items-center gap-1.5">
+      {showMeta && verified && (
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
           <ShieldCheck className="h-3.5 w-3.5" />
           {verified[1]}/{verified[2]} kutipan terverifikasi
         </span>
       )}
+      {markdown && hasMeta && (
+        <button
+          type="button"
+          aria-pressed={showMeta}
+          onClick={() => setShowMeta((v) => !v)}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ring-inset transition-colors",
+            showMeta ? "bg-primary/10 text-primary ring-primary/30" : "bg-muted text-muted-foreground ring-border hover:text-foreground"
+          )}
+        >
+          <Database className="h-3.5 w-3.5" />
+          {showMeta ? "Sembunyikan Metadata" : "Tampilkan Metadata"}
+        </button>
+      )}
+      </div>
     </div>
   );
 
@@ -135,7 +164,7 @@ export default function ClinicalReport({
   const bodyProps = { sources: report.sources, kind, openFdi, setOpenFdi, onShowTooth, grades };
 
   return (
-    <CitationProvider sources={report.sources}>
+    <CitationProvider sources={report.sources} visible={showMeta}>
       <div ref={rootRef} className="scroll-mt-32 rounded-3xl border bg-card p-4 shadow-sm sm:p-5">
         {header}
 

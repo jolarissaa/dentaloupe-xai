@@ -19,6 +19,14 @@ const SOURCES_TITLE = /^(rujukan|referensi|sumber|daftar pustaka)\b/i;
 const ALERT_TITLE = /(tanda bahaya|red flag)/i;
 const TOOTH_PARA = /^\*\*Gigi\s+(\d{2})\b([^*]*)\*\*\s*[—–:-]?\s*([\s\S]*)$/;
 const VISIT_ITEM = /^\d+\.\s+\*\*(.+?)\*\*\s*([\s\S]*)$/;
+const TRIAGE_TITLE = /(prioritas|triase)/i;
+// `1. **Segera — gigi 21 dan 11:** reason` or `1. **Cepat:** gigi **12** karena …`
+const TRIAGE_ITEM = /^\d+\.\s+\*\*(Segera|Cepat|Terjadwal|Pemantauan)\b([^*]*)\*\*\s*([\s\S]*)$/i;
+// FDI tooth numbers: permanent 11–48, primary 51–85.
+const FDI_NUMBER = /\b(?:[1-4][1-8]|[5-8][1-5])\b/g;
+
+/** Urgency levels, most urgent first. */
+export const TRIAGE_LEVELS = ["Segera", "Cepat", "Terjadwal", "Pemantauan"];
 
 /** URL-safe id for a section title. */
 export function slug(text) {
@@ -168,6 +176,43 @@ function findVisits(body) {
 }
 
 /**
+ * A numbered list whose items open with a bold urgency level (Segera / Cepat / Terjadwal /
+ * Pemantauan) → { level, label, teeth, reason } per item. The teeth are read from the item's
+ * lead ("gigi 21 dan 11"), or when the lead is only the level, from the reason up to "karena".
+ */
+function findTriage(body) {
+  const items = [];
+  const before = [];
+  const after = [];
+  let cur = null;
+  for (const l of body.split("\n")) {
+    const m = TRIAGE_ITEM.exec(l.trim());
+    if (m) {
+      if (cur) items.push(cur);
+      const level = TRIAGE_LEVELS.find((x) => x.toLowerCase() === m[1].toLowerCase());
+      const lead = m[2].replace(/^[\s—–:-]+/, "").replace(/[\s:：]+$/, "").trim();
+      const reason = m[3].trim();
+      const scope = (lead || reason.split(/\bkarena\b|[;:]/)[0]).replace(/\*\*/g, "");
+      const teeth = [...new Set((scope.match(FDI_NUMBER) || []).map(Number))];
+      cur = { level, label: lead || (teeth.length ? `gigi ${teeth.join(", ")}` : level), teeth, reason };
+    } else if (cur && /^\s{2,}\S/.test(l)) {
+      cur.reason += " " + l.trim();
+    } else if (!l.trim()) {
+      if (!cur) (items.length ? after : before).push(l);
+    } else {
+      if (cur) {
+        items.push(cur);
+        cur = null;
+      }
+      (items.length ? after : before).push(l);
+    }
+  }
+  if (cur) items.push(cur);
+  if (items.length < 2) return null;
+  return { items, before: before.join("\n").trim(), after: after.join("\n").trim() };
+}
+
+/**
  * @param {string} markdown
  * @returns {{ title: string|null, intro: string, sections: Array<{id:string,title:string,body:string,kind:string,data?:object}>, sources: Array<{id:string,title:string,meta:string,url:string|null,quotes:string[]}> }}
  */
@@ -202,6 +247,8 @@ export function parseReport(markdown) {
     used.add(id);
 
     if (SOURCES_TITLE.test(s.title)) return { id, title: s.title, body, kind: "sources" };
+    const triage = TRIAGE_TITLE.test(s.title) ? findTriage(body) : null;
+    if (triage) return { id, title: s.title, body, kind: "triage", data: triage };
     const table = findToothTable(body);
     if (table) return { id, title: s.title, body, kind: "teeth-table", data: table };
     const notes = findToothNotes(body);

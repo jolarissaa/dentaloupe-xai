@@ -14,13 +14,14 @@ import { cn } from "@/lib/utils";
  * so a claim can be audited without leaving the paragraph it supports.
  */
 
-const CitationContext = createContext({ sources: [], open: () => {} });
+const CitationContext = createContext({ sources: [], open: () => {}, visible: true });
 
-export function CitationProvider({ sources, children }) {
+/** `visible` false keeps the citations in the document but hides their chips (metadata off). */
+export function CitationProvider({ sources, visible = true, children }) {
   const [openId, setOpenId] = useState(null);
   const source = sources.find((s) => s.id === openId) || null;
   return (
-    <CitationContext.Provider value={{ sources, open: setOpenId }}>
+    <CitationContext.Provider value={{ sources, open: setOpenId, visible }}>
       {children}
       <SourceSheet source={source} onClose={() => setOpenId(null)} />
     </CitationContext.Provider>
@@ -28,8 +29,9 @@ export function CitationProvider({ sources, children }) {
 }
 
 export function CitationChip({ id }) {
-  const { sources, open } = useContext(CitationContext);
+  const { sources, open, visible } = useContext(CitationContext);
   const known = sources.some((s) => s.id === id);
+  if (!visible) return null;
   return (
     <button
       type="button"

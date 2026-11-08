@@ -41,11 +41,12 @@ describe("LLM cards", () => {
     render(<LlmDiagnosis markdown={CITED_MD} />);
 
     const rail = screen.getByRole("tablist", { name: /Bagian Diagnosis/ });
-    expect(within(rail).getAllByRole("tab")).toHaveLength(3);
-    expect(screen.getByText("Bagian 1 dari 3")).toBeInTheDocument();
+    // the Rujukan section is metadata: hidden until asked for
+    expect(within(rail).getAllByRole("tab")).toHaveLength(2);
+    expect(screen.getByText("Bagian 1 dari 2")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /Berikutnya/ }));
-    expect(await screen.findByText("Bagian 2 dari 3")).toBeInTheDocument();
+    expect(await screen.findByText("Bagian 2 dari 2")).toBeInTheDocument();
     expect(screen.getByText(/Anak diperkirakan sulit makan/)).toBeInTheDocument();
   });
 
@@ -67,6 +68,8 @@ describe("LLM cards", () => {
     await user.click(within(screen.getByRole("tablist", { name: /Bagian/ })).getByRole("tab", { name: /Dampak Harian/ }));
 
     expect(container.textContent).not.toContain("[^1]");
+    expect(screen.queryByRole("button", { name: "Rujukan 1" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Tampilkan Metadata" }));
     await user.click(screen.getByRole("button", { name: "Rujukan 1" }));
     const sheet = await screen.findByRole("dialog", { name: "Rujukan 1" });
     expect(within(sheet).getByText(/difficulty eating and disturbed sleep/)).toBeInTheDocument();
@@ -76,6 +79,7 @@ describe("LLM cards", () => {
   it("lists every source in the Rujukan section", async () => {
     const user = userEvent.setup();
     render(<LlmDiagnosis markdown={CITED_MD} />);
+    await user.click(screen.getByRole("button", { name: "Tampilkan Metadata" }));
     await user.click(within(screen.getByRole("tablist", { name: /Bagian/ })).getByRole("tab", { name: /Rujukan/ }));
     expect(await screen.findByText("Impact of untreated caries")).toBeInTheDocument();
     expect(screen.getByText(/difficulty eating and disturbed sleep/)).toBeInTheDocument();

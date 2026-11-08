@@ -40,6 +40,55 @@ function buildShapeMeta(teeth) {
   }
   return meta;
 }
+// Arrows pointing at every affected tooth (non-pickable, parented to the scene so they share its
+// frame). Each sits just outside the crown on the cheek side and tilts toward the bite plane, so
+// it reads in the occlusal (Atas/Bawah) views and the frontal (Keduanya) view alike.
+const ARROWS_NAME = "dl-affected-arrows";
+const ARROW_COLOR = 0x3dd6a8;
+
+function makeArrow(w) {
+  const mat = new THREE.MeshStandardMaterial({ color: ARROW_COLOR, emissive: ARROW_COLOR, emissiveIntensity: 0.5, roughness: 0.4 });
+  const head = new THREE.Mesh(new THREE.ConeGeometry(w * 0.22, w * 0.45, 18), mat);
+  head.rotation.x = Math.PI; // tip on the origin, pointing −Y
+  head.position.y = w * 0.225;
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.07, w * 0.07, w * 0.7, 12), mat);
+  shaft.position.y = w * 0.45 + w * 0.35;
+  const g = new THREE.Group();
+  g.add(head, shaft);
+  g.traverse((o) => { if (o.isMesh) o.raycast = () => {}; });
+  return g;
+}
+
+function buildArrows(scene, teeth, centers, biteMidY) {
+  const old = scene.getObjectByName(ARROWS_NAME);
+  if (old) scene.remove(old);
+  const group = new THREE.Group();
+  group.name = ARROWS_NAME;
+  const list = Object.values(teeth).filter((t) => t.Enamel);
+  const w = median(list.map((t) => { const s = new THREE.Vector3(); t.Enamel.box.getSize(s); return Math.max(s.x, s.z); })) || 1;
+  const arrows = {};
+  for (const t of list) {
+    const c = t.Enamel.center;
+    const arch = t.upper ? centers.upper : centers.lower;
+    const out = new THREE.Vector3(c.x - arch.x, 0, c.z - arch.z);
+    if (out.lengthSq() < 1e-9) out.set(0, 0, 1);
+    out.normalize();
+    const s = new THREE.Vector3();
+    t.Enamel.box.getSize(s);
+    const toBite = c.y > biteMidY ? -1 : 1;
+    const crown = new THREE.Vector3(c.x, c.y + toBite * s.y * 0.3, c.z);
+    const dir = out.clone().add(new THREE.Vector3(0, toBite * 0.45, 0)).normalize();
+    const a = makeArrow(w * 0.5);
+    a.position.copy(crown).addScaledVector(out, w * 0.45);
+    a.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    a.visible = false;
+    group.add(a);
+    arrows[t.fdi] = a;
+  }
+  scene.add(group);
+  return arrows;
+}
+
 function median(a) { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; }
 
 // Layered teeth (enamel/dentine/pulp), carved at runtime from detections. Extracted
@@ -49,7 +98,7 @@ const GLB_URL = "/teeth_layered.glb";
 // meshes, Gum_Upper / Gum_Lower, whose coronal edge sits at the teeth's cervical line.
 const GUM_URL = "/gums.glb";
 
-function LayeredTeethModel({ detections, archMode, showGum, selected, hover, setSelected, setHover, onReady }) {
+function LayeredTeethModel({ detections, archMode, showGum, showArrows, selected, hover, setSelected, setHover, onReady }) {
   const { scene } = useGLTF(GLB_URL);
   const { scene: gumScene } = useGLTF(GUM_URL);
   const groupRef = useRef();
@@ -107,7 +156,8 @@ function LayeredTeethModel({ detections, archMode, showGum, selected, hover, set
       gum[arch] = o;
     });
 
-    stateRef.current = { teeth, biteMidY, centers, scale: 3.4 / sphere.radius, gum, gumScene };
+    const arrows = buildArrows(scene, teeth, centers, biteMidY);
+    stateRef.current = { teeth, biteMidY, centers, scale: 3.4 / sphere.radius, gum, gumScene, arrows };
     onReady?.(list.map((t) => t.fdi).sort((a, b) => a - b));
   }, [scene, gumScene, onReady]);
 
@@ -115,13 +165,14 @@ function LayeredTeethModel({ detections, archMode, showGum, selected, hover, set
   // effect) so visibility survives an archMode toggle. Depends on detections so a new patient's
   // missing set re-applies.
   useEffect(() => {
-    const { teeth, centers, scale, gum = {}, gumScene: gs } = stateRef.current;
+    const { teeth, centers, scale, gum = {}, gumScene: gs, arrows = {} } = stateRef.current;
     if (!Object.keys(teeth).length || !groupRef.current) return;
     for (const t of Object.values(teeth)) {
       const det = detections?.teeth?.[String(t.fdi)];
       const missing = !!det && (det.present === false || det.missing === true);
       const vis = !missing && (archMode === "both" || (archMode === "upper") === t.upper);
       for (const L of ["Enamel", "Dentine", "Pulp"]) if (t[L]) t[L].mesh.visible = vis;
+      if (arrows[t.fdi]) arrows[t.fdi].visible = showArrows && vis && !!det && det.severity > 0;
     }
     const c = centers[archMode] || centers.both;
     scene.position.set(-c.x, -c.y, -c.z);
@@ -134,7 +185,7 @@ function LayeredTeethModel({ detections, archMode, showGum, selected, hover, set
     groupRef.current.rotation.set(
       archMode === "upper" ? -Math.PI / 2 : archMode === "lower" ? Math.PI / 2 : -0.32, 0, 0
     );
-  }, [archMode, scene, detections, showGum]);
+  }, [archMode, scene, detections, showGum, showArrows]);
 
   // (re)shape from the panoramic tooth-seg, then (re)carve, on detection change. The shape morph
   // rebuilds each tooth from its true pristine and re-baselines the carve, so switching patients
@@ -214,6 +265,7 @@ function ProgressReporter({ onProgress }) {
 export default function Teeth3D({ detections, archMode = "upper", selected, onSelectTooth, onReady, onProgress }) {
   const [hover, setHover] = useState(null);
   const [showGum, setShowGum] = useState(false);
+  const [showArrows, setShowArrows] = useState(true);
 
   return (
     <div className="relative h-full w-full">
@@ -230,6 +282,7 @@ export default function Teeth3D({ detections, archMode = "upper", selected, onSe
             detections={detections}
             archMode={archMode}
             showGum={showGum}
+            showArrows={showArrows}
             selected={selected}
             hover={hover}
             setSelected={(fdi) => onSelectTooth?.(fdi)}
@@ -241,7 +294,7 @@ export default function Teeth3D({ detections, archMode = "upper", selected, onSe
         <OrbitControls enablePan={false} minDistance={4} maxDistance={12} target={[0, 0, 0]} />
       </Canvas>
       {hover && hover !== selected ? (
-        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">
+        <div className="pointer-events-none absolute left-14 top-3 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">
           Gigi {hover}
         </div>
       ) : null}
@@ -255,6 +308,17 @@ export default function Teeth3D({ detections, archMode = "upper", selected, onSe
         }
       >
         {showGum ? "Sembunyikan Gusi" : "Tampilkan Gusi"}
+      </button>
+      <button
+        type="button"
+        aria-pressed={showArrows}
+        onClick={() => setShowArrows((v) => !v)}
+        className={
+          "absolute right-3 top-12 rounded-full px-3 py-1.5 text-xs font-medium shadow transition-colors " +
+          (showArrows ? "bg-[#3DD6A8] text-[#0A2342]" : "bg-black/60 text-white hover:bg-black/70")
+        }
+      >
+        {showArrows ? "Sembunyikan Panah" : "Tampilkan Panah"}
       </button>
     </div>
   );

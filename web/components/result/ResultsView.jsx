@@ -8,6 +8,8 @@ import {
   ChartColumn,
   ClipboardList,
   Images,
+  Maximize2,
+  Minimize2,
   MessageSquareText,
   Microscope,
   MousePointerClick,
@@ -200,7 +202,22 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
   const [selected, setSelected] = useState(null);
   const [examine, setExamine] = useState(null);
   const [focus, setFocus] = useState(null);
+  const [full, setFull] = useState(false);
   const navRef = useRef(null);
+
+  // Full-screen 3D is a fixed overlay rather than the Fullscreen API, which iPhone Safari does
+  // not offer for page elements. Esc leaves it; the page behind does not scroll meanwhile.
+  useEffect(() => {
+    if (!full) return;
+    const onKey = (e) => e.key === "Escape" && setFull(false);
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [full]);
 
   const ids = useMemo(() => NAV.map((n) => n.id), []);
   const active = useScrollSpy(ids);
@@ -285,9 +302,17 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
 
       <main className="mx-auto max-w-3xl px-4 pb-16 pt-4 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start lg:gap-8">
         {/* 3D — sticky beside the report on wide screens */}
-        <section id="model" aria-label="Model 3D" className="scroll-mt-32 space-y-3 lg:sticky lg:top-[132px]">
-          <div className="relative overflow-hidden rounded-3xl border bg-[#0A1A2F] shadow-[0_20px_50px_-24px_rgba(15,23,42,0.6)] animate-fade-in">
-            <div className="h-[52vh] min-h-[320px] w-full lg:h-[calc(100dvh-330px)] lg:min-h-[380px]">
+        {/* sticky creates a stacking context that would trap the full-screen overlay under the header */}
+        <section id="model" aria-label="Model 3D" className={cn("scroll-mt-32 space-y-3", !full && "lg:sticky lg:top-[132px]")}>
+          <div
+            className={cn(
+              "overflow-hidden bg-[#0A1A2F]",
+              full
+                ? "fixed inset-0 z-[70]"
+                : "relative rounded-3xl border shadow-[0_20px_50px_-24px_rgba(15,23,42,0.6)] animate-fade-in"
+            )}
+          >
+            <div className={full ? "h-full w-full" : "h-[52vh] min-h-[320px] w-full lg:h-[calc(100dvh-330px)] lg:min-h-[380px]"}>
               <Teeth3D
                 detections={detections}
                 archMode={archMode}
@@ -297,6 +322,25 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
                 onProgress={onModelProgress}
               />
             </div>
+            <button
+              type="button"
+              onClick={() => setFull((v) => !v)}
+              aria-label={full ? "Keluar dari layar penuh" : "Layar penuh"}
+              title={full ? "Keluar dari layar penuh (Esc)" : "Layar penuh"}
+              className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow transition-colors hover:bg-black/75"
+            >
+              {full ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </button>
+            {full && sel && (
+              <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900 shadow">
+                Gigi {sel.fdi} — {sel.severity ? `D${sel.severity}` : "Sehat"}
+              </div>
+            )}
+            {full && (
+              <p className="pointer-events-none absolute inset-x-0 bottom-16 px-4 text-center text-[11px] text-white/60">
+                Gambar ini merupakan simulasi berdasarkan hasil deteksi AI, bukan gambar klinis sebenarnya.
+              </p>
+            )}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-3">
               <ArchTabs value={archMode} onChange={setArchMode} overlay className="pointer-events-auto w-full max-w-xs" />
             </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Crosshair, LayoutList, Table2, TriangleAlert } from "lucide-react";
 
 import { ICDAS_COLORS } from "@/lib/damage";
@@ -11,6 +11,48 @@ const gradeOf = (v) => {
   const m = /D\s*([1-6])/i.exec(String(v || ""));
   return m ? Number(m[1]) : 0;
 };
+
+/** Permanent quadrants 1–2 and primary 5–6 are the upper jaw. */
+const isUpper = (fdi) => [1, 2, 5, 6].includes(Math.floor(fdi / 10));
+const inJaw = (jaw, fdi) => jaw === "all" || !fdi || (jaw === "upper") === isUpper(fdi);
+const JAWS = [
+  ["all", "Semua"],
+  ["upper", "Rahang Atas"],
+  ["lower", "Rahang Bawah"],
+];
+
+/** Semua / Rahang Atas / Rahang Bawah filter for the per-tooth lists. */
+export function JawFilter({ value, onChange }) {
+  return (
+    <div className="inline-flex rounded-full bg-muted p-0.5" role="tablist" aria-label="Filter rahang">
+      {JAWS.map(([key, label]) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          aria-selected={value === key}
+          onClick={() => onChange(key)}
+          className={cn(
+            "rounded-full px-2.5 py-1 text-xs font-medium transition-all",
+            value === key ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+          )}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Keeps a tooth picked elsewhere (3D, summary) visible: switches back to "Semua" if needed. */
+function useJaw(openFdi) {
+  const [jaw, setJaw] = useState("all");
+  useEffect(() => {
+    if (openFdi && !inJaw(jaw, openFdi)) setJaw("all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- react to a new focus only
+  }, [openFdi]);
+  return [jaw, setJaw];
+}
 
 /** Tone for short categorical values (urgency / confidence) so they scan at a glance. */
 function toneFor(value) {
@@ -58,17 +100,20 @@ function ShowIn3D({ fdi, onShowTooth }) {
 export function ToothTable({ kind, data, openFdi, setOpenFdi, onShowTooth }) {
   const [view, setView] = useState("cards");
   const [allOpen, setAllOpen] = useState(false);
-  const { header, rows } = data;
+  const [jaw, setJaw] = useJaw(openFdi);
+  const { header } = data;
+  const rows = data.rows.filter((r) => inJaw(jaw, fdiOf(r[0])));
 
   const nameCol = header.findIndex((h) => /nama/i.test(h));
   const gradeCol = header.findIndex((h) => /icdas/i.test(h));
   const rest = header.map((_, i) => i).filter((i) => i > 0 && i !== nameCol && i !== gradeCol);
-  const longest = (i) => Math.max(...rows.map((r) => String(r[i] || "").length));
+  const longest = (i) => Math.max(0, ...data.rows.map((r) => String(r[i] || "").length));
   const shortCols = rest.filter((i) => longest(i) <= 16);
   const longCols = rest.filter((i) => !shortCols.includes(i));
 
   return (
     <div className="space-y-3">
+      <JawFilter value={jaw} onChange={setJaw} />
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">
           <span className="font-semibold text-foreground">{rows.length}</span> gigi
@@ -218,11 +263,15 @@ export function ToothTable({ kind, data, openFdi, setOpenFdi, onShowTooth }) {
 
 /** "**Gigi 21 (…)** — paragraph" blocks as one card per tooth. */
 export function ToothNotes({ kind, data, openFdi, onShowTooth, grades }) {
+  const [jaw, setJaw] = useJaw(openFdi);
+  const notes = data.notes.filter((n) => inJaw(jaw, n.fdi));
   return (
     <div className="space-y-3">
       <Md>{data.before}</Md>
+      <JawFilter value={jaw} onChange={setJaw} />
+      {notes.length === 0 && <p className="text-sm text-muted-foreground">Tidak ada gigi pada rahang ini.</p>}
       <ul className="space-y-2.5">
-        {data.notes.map((n, i) => (
+        {notes.map((n, i) => (
           <li
             key={i}
             id={`${kind}-tooth-${n.fdi}`}
