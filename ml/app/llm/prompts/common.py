@@ -37,6 +37,12 @@ SAFETY_RULES = """- **Jangan mengarang isi dokumen.** Sitasi hanya bila kalimat 
 - **Keputusan akhir ada pada dokter gigi.** Tulis sebagai masukan untuk klinisi, bukan
   sebagai instruksi kepada pasien, dan jangan menjanjikan hasil."""
 
+# House style the doctor asked for: no decimals and no semicolons in the documents.
+NUMBER_STYLE_RULE = """- **Angka ditulis sebagai persentase bulat.** Rasio, luas lesi, dan kegelapan relatif
+  ditulis dalam persen tanpa desimal (0,289 menjadi 29%, 11,8% menjadi 12%). Kode ICD-10
+  (mis. K02.1) tetap ditulis apa adanya.
+- **Jangan memakai titik koma (;).** Pisahkan gagasan menjadi kalimat terpisah."""
+
 NO_IDEM_RULE = """- **Setiap gigi dianalisis sendiri-sendiri.** DILARANG menulis "Idem", "sda",
   "sama seperti di atas", "—", tanda kutip berulang, atau kalimat yang identik dengan baris
   lain. Bila dua gigi memang serupa, tetap bedakan dengan menyebut angka spesifik gigi itu

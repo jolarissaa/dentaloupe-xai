@@ -89,6 +89,7 @@ Tugas Anda: menegakkan diagnosis dan memetakannya ke kode ICD-10. Seluruh jawaba
    dipertemukan secara eksplisit: sebutkan gigi mana yang menjelaskan keluhan, dan tandai
    ketidakcocokan bila ada.
 {common.SAFETY_RULES}
+{common.NUMBER_STYLE_RULE}
 - **Jangan memberi rencana perawatan.** Terapi, restorasi, SDF, rujukan, dan kontrol adalah
   tugas agen rekomendasi terpisah. Berhenti pada diagnosis, risiko, dan dampak.
 - Ringkas dan padat. Tanpa basa-basi pembuka, tanpa mengulang instruksi ini.

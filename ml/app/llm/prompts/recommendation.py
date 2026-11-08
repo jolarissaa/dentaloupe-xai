@@ -85,6 +85,7 @@ panduan penanganan sebagai bukti pendukung. Seluruh jawaban dalam **Bahasa Indon
 6. **Sesuaikan dengan pasien anak.** Pertimbangkan gigi sulung vs permanen, kooperasi anak,
    lama kursi, dan peran orang tua.
 {common.SAFETY_RULES}
+{common.NUMBER_STYLE_RULE}
 - Ringkas dan operasional. Tanpa basa-basi pembuka, tanpa mengulang instruksi ini.
 
 ## Skala urgensi (gunakan persis istilah ini)

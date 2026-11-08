@@ -12,6 +12,8 @@
  * markdown.
  */
 
+import { humanizeClinicalText } from "@/lib/clinicalText";
+
 const H1 = /^#\s+(.+?)\s*$/;
 const H2 = /^##\s+(.+?)\s*$/;
 const FOOTNOTE_DEF = /^\[\^([^\]\s]+)\]:\s?(.*)$/;
@@ -217,7 +219,11 @@ function findTriage(body) {
  * @returns {{ title: string|null, intro: string, sections: Array<{id:string,title:string,body:string,kind:string,data?:object}>, sources: Array<{id:string,title:string,meta:string,url:string|null,quotes:string[]}> }}
  */
 export function parseReport(markdown) {
-  const { lines, sources } = extractSources(String(markdown || "").replace(/\r\n?/g, "\n").split("\n"));
+  const extracted = extractSources(String(markdown || "").replace(/\r\n?/g, "\n").split("\n"));
+  const { sources } = extracted;
+  // House style (whole percentages, no semicolons) applies to the document's own text only;
+  // the sources' verbatim quotes were taken out above and stay untouched.
+  const lines = extracted.lines.map(humanizeClinicalText);
 
   let title = null;
   const intro = [];
