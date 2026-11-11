@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { overlayDesc, overlayTitle } from "@/lib/overlayLabels";
+import { LogoWatermark } from "@/components/brand/Logo";
 
 /**
  * Per-model detection overlays + XAI attention maps as a horizontal slider.
@@ -57,9 +58,10 @@ export default function ModelGallery({
             onClick={() => setActive(i)}
             className="group w-56 shrink-0 snap-start overflow-hidden rounded-2xl border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-14px_rgba(15,23,42,0.35)]"
           >
-            <div className="aspect-video w-full overflow-hidden bg-muted">
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={it.src} alt={it.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <LogoWatermark className="absolute bottom-1.5 right-2 h-3.5 w-auto !text-white opacity-70 drop-shadow" />
             </div>
             <div className="p-2.5">
               <p className="truncate text-xs font-semibold">{it.title}</p>
@@ -143,6 +145,9 @@ function Lightbox({ item, onClose, onPrev, onNext, hasPrev, hasNext }) {
           draggable={false}
           style={{ transform: `translate(${t.x}px, ${t.y}px) scale(${t.s})` }}
         />
+        {/* Brand silhouette over the image so a screenshot of it keeps the mark. */}
+        <LogoWatermark className="absolute left-1/2 top-1/2 h-auto w-[38%] -translate-x-1/2 -translate-y-1/2 !text-white opacity-[0.18]" />
+        <LogoWatermark className="absolute bottom-2 right-3 h-5 w-auto !text-white opacity-75 drop-shadow" />
       </div>
       <div className="mt-3 flex items-center gap-3 text-sm text-white" onClick={(e) => e.stopPropagation()}>
         <b>{item.title}</b>

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 
-import { TOOTH_PATH } from "@/components/brand/Logo";
+import { LogoMark } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,10 +35,10 @@ function useSmoothPercent(target, ceiling = target) {
   return Math.min(100, Math.floor(Math.max(shown, 0)));
 }
 
-/** Tooth outline with a scan band sweeping through it, inside a slow orbit ring. */
+/** The Dentaloupe glasses in "scan" mode (glints circling the lenses) inside a slow orbit ring. */
 function ScanMark() {
   return (
-    <div className="relative h-28 w-28">
+    <div className="relative flex h-28 w-28 items-center justify-center">
       <svg viewBox="0 0 120 120" className="tf-orbit absolute inset-0 h-full w-full" aria-hidden>
         <circle cx="60" cy="60" r="56" fill="none" stroke="hsl(var(--primary) / 0.12)" strokeWidth="2" />
         <circle
@@ -47,26 +47,7 @@ function ScanMark() {
         />
         <circle cx="60" cy="4" r="3.5" fill="hsl(var(--primary))" />
       </svg>
-      <svg viewBox="0 0 64 64" className="absolute inset-[22%] h-[56%] w-[56%]" aria-hidden>
-        <defs>
-          <clipPath id="tf-scan-clip">
-            <path d={TOOTH_PATH} />
-          </clipPath>
-          <linearGradient id="tf-scan-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="hsl(var(--primary))" stopOpacity="0" />
-            <stop offset="0.8" stopColor="hsl(var(--primary))" stopOpacity="0.55" />
-            <stop offset="1" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
-          </linearGradient>
-        </defs>
-        <path d={TOOTH_PATH} fill="hsl(var(--primary) / 0.08)" />
-        <g clipPath="url(#tf-scan-clip)">
-          <rect className="tf-scan-band" x="0" y="0" width="64" height="12" fill="url(#tf-scan-grad)" />
-        </g>
-        <path
-          d={TOOTH_PATH} fill="none" stroke="hsl(var(--primary))" strokeWidth="2.6"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <LogoMark motion="scan" title="" className="relative h-auto w-[64%]" />
     </div>
   );
 }

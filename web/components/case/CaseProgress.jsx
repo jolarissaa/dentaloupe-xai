@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, RotateCcw } from "lucide-react";
@@ -32,6 +32,11 @@ export default function CaseProgress({ caseId, onDone, onRetry }) {
     refetchInterval: (query) =>
       TERMINAL.has(query.state.data?.status) ? false : POLL_MS,
     enabled: !!caseId,
+    // A finished status must not outlive this screen: when the same case is analysed again,
+    // a cached "done" would hand straight back to the results page, which is still waiting
+    // for the new run, and the two would bounce off each other in a tight request loop.
+    gcTime: 0,
+    refetchOnMount: "always",
   });
 
   // Warm the results view while the analysis is still running. Importing the 3D module pulls
@@ -49,12 +54,21 @@ export default function CaseProgress({ caseId, onDone, onRetry }) {
   const progress = Math.max(0, Math.min(100, data?.progress ?? 0));
   const error = data?.error;
 
+  // Hand over once per finished run. `onDone` is usually an inline callback, so keying the
+  // effect on it would fire again on every parent render.
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+  const handedOver = useRef(false);
   useEffect(() => {
-    if (status === "done") {
-      if (onDone) onDone();
-      else router.push(`/case/${caseId}?from=analysis`);
+    if (status !== "done") {
+      handedOver.current = false;
+      return;
     }
-  }, [status, caseId, onDone, router]);
+    if (handedOver.current) return;
+    handedOver.current = true;
+    if (onDoneRef.current) onDoneRef.current();
+    else router.push(`/case/${caseId}?from=analysis`);
+  }, [status, caseId, router]);
 
   if (status === "failed") {
     return (

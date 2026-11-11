@@ -103,7 +103,7 @@ export default function HistoryList() {
   if (cases.length === 0) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed px-6 py-10 text-center animate-fade-in">
-        <LogoMark className="h-10 w-10 opacity-25 grayscale" title="" />
+        <LogoMark tone="mono" motion="static" className="h-10 w-auto text-[hsl(var(--brand-grey))] opacity-50" title="" />
         <p className="mt-3 text-sm font-medium">Belum ada riwayat kasus.</p>
         <p className="mt-1 text-xs text-muted-foreground">Mulai dengan menekan “Kasus Baru”.</p>
       </div>

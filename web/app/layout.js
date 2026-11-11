@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import BrandBackdrop from "@/components/brand/BrandBackdrop";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#0F2F57",
+  themeColor: "#043162",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -41,6 +42,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="id" className={poppins.variable}>
       <body>
+        <BrandBackdrop />
         <Providers>{children}</Providers>
       </body>
     </html>

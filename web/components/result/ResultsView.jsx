@@ -20,6 +20,7 @@ import {
 import { ICDAS_COLORS } from "@/lib/damage";
 import { ICDAS_LABEL_ID, summarize } from "@/lib/caries";
 import { cn } from "@/lib/utils";
+import { LogoWatermark } from "@/components/brand/Logo";
 import ArchTabs from "@/components/result/ArchTabs";
 import CariesSummary from "@/components/result/CariesSummary";
 import PatientPhotos from "@/components/result/PatientPhotos";
@@ -322,6 +323,7 @@ export default function ResultsView({ caseData, detections, base, onModelReady, 
                 onProgress={onModelProgress}
               />
             </div>
+            <LogoWatermark className="absolute bottom-[68px] left-3.5 h-4 w-auto !text-white opacity-40" />
             <button
               type="button"
               onClick={() => setFull((v) => !v)}

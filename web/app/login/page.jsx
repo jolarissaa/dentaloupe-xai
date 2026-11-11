@@ -87,7 +87,7 @@ export default function LoginPage() {
   return (
     // flex-col + my-auto on the panel keeps the form optically centred while the reset control
     // stays pinned to the bottom edge of the screen.
-    <main className="relative flex min-h-dvh flex-col items-center overflow-hidden bg-background px-4 py-6">
+    <main className="relative flex min-h-dvh flex-col items-center overflow-hidden px-4 py-6">
       {/* backdrop: dotted field fading out from a soft blue glow behind the mark */}
       <div className="bg-dots pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_10%,transparent_65%)]" />
       <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[36rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
@@ -96,10 +96,10 @@ export default function LoginPage() {
         <div className="mb-8 flex flex-col items-center text-center">
           <p className="mb-4 text-sm font-bold tracking-[0.35em] text-primary">NAIA</p>
           <div className="tf-float">
-            <LogoMark animated className="h-16 w-16 drop-shadow-[0_10px_24px_rgba(15,47,87,0.28)]" />
+            <LogoMark motion="intro" className="h-16 w-auto drop-shadow-[0_10px_24px_rgba(4,49,98,0.22)]" />
           </div>
           <h1 className="mt-5 text-2xl font-semibold tracking-tight animate-rise" style={{ "--i": 3 }}>
-            Masuk ke Dentaloupe<span className="text-[hsl(var(--brand-green))]">-XAI</span>
+            Masuk ke Dentaloupe<span className="text-[hsl(var(--brand-grey))]">-XAI</span>
           </h1>
           <p className="mt-1.5 max-w-[17rem] text-sm text-muted-foreground animate-rise" style={{ "--i": 4 }}>
             Deteksi karies &amp; rekonstruksi gigi 3D untuk dokter gigi

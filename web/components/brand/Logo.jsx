@@ -1,64 +1,134 @@
 import { useId } from "react";
 
 import { cn } from "@/lib/utils";
+import {
+  LENS_LEFT,
+  LENS_R,
+  LENS_RIGHT,
+  MARK_GLINT,
+  MARK_NAVY,
+  MARK_VIEWBOX,
+  WORD_GREY,
+  WORD_NAVY,
+  WORD_VIEWBOX,
+} from "./logoPaths";
 
-/** Tooth silhouette (crown + two roots) on a 64-unit grid. Shared with the analysis loader. */
-export const TOOTH_PATH =
-  "M22 11C15.6 11 11.5 15.6 11.5 22.2c0 5.6 2.3 9 3.8 13.4 1.8 5.4 2 15.4 7.4 15.4 4.3 0 4.5-7.6 6-11.5.8-2.1 1.9-2.9 3.3-2.9s2.5.8 3.3 2.9c1.5 3.9 1.7 11.5 6 11.5 5.4 0 5.6-10 7.4-15.4 1.5-4.4 3.8-7.8 3.8-13.4C52.5 15.6 48.4 11 42 11c-4 0-6.3 1.9-10 1.9S26 11 22 11Z";
+const LENSES = [LENS_LEFT, LENS_RIGHT];
 
 /**
- * PLACEHOLDER Dentaloupe-XAI mark: a tooth seen through a loupe on a navy tile. To be replaced
- * once the final logo is ready; the colours follow the palette in app/globals.css.
+ * The Dentaloupe "dp" monogram: a pair of loupe glasses.
  *
- * `animated` pops the tile and lens in and draws the tooth, used on the sign-in screen. Motion
- * is dropped entirely under `prefers-reduced-motion`.
+ * Motion says what the app is doing rather than decorating it (all of it is dropped under
+ * `prefers-reduced-motion`, see app/globals.css):
+ *   - `intro`  — the glasses come into focus and the glints settle into the lenses (sign-in).
+ *   - `idle`   — a light gleam runs along the frame now and then, and on hover.
+ *   - `scan`   — the glints circle inside the lenses while an analysis is running.
+ * `tone="mono"` draws everything in one colour (currentColor) for watermarks and dark tiles.
  */
-export function LogoMark({ className, animated = false, title = "Dentaloupe-XAI" }) {
-  const gid = useId().replace(/:/g, "");
+export function LogoMark({ className, motion = "idle", tone = "brand", title = "Dentaloupe-XAI" }) {
+  const id = useId().replace(/:/g, "");
+  const mono = tone === "mono";
   return (
     <svg
-      viewBox="0 0 64 64"
-      role="img"
-      aria-label={title}
-      className={cn("tf-logo shrink-0", animated && "tf-logo--animated", className)}
+      viewBox={MARK_VIEWBOX}
+      role={title ? "img" : undefined}
+      aria-label={title || undefined}
+      aria-hidden={title ? undefined : true}
+      className={cn("dl-mark shrink-0", `dl-mark--${motion}`, className)}
     >
       <defs>
-        <linearGradient id={`tile-${gid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#17427A" />
-          <stop offset="1" stopColor="#0A2342" />
+        <clipPath id={`frame-${id}`}>
+          <path d={MARK_NAVY} fillRule="evenodd" clipRule="evenodd" />
+        </clipPath>
+        {LENSES.map(([cx, cy], i) => (
+          <clipPath key={i} id={`lens${i}-${id}`}>
+            <circle cx={cx} cy={cy} r={LENS_R} />
+          </clipPath>
+        ))}
+        <linearGradient id={`gleam-${id}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.5" stopColor="#fff" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <rect className="tf-logo-tile" width="64" height="64" rx="17" fill={`url(#tile-${gid})`} />
-      <g transform="translate(28 28) scale(0.56) translate(-32 -31)">
+
+      <g className="dl-mark-body">
         <path
-          className="tf-logo-tooth"
-          d={TOOTH_PATH}
-          pathLength="1"
-          fill="#fff"
-          stroke="#fff"
-          strokeWidth="2.2"
-          strokeLinejoin="round"
+          d={MARK_NAVY}
+          fillRule="evenodd"
+          fill={mono ? "currentColor" : "hsl(var(--brand-navy))"}
         />
+        {/* A soft band of light travelling along the frame. */}
+        {!mono && (
+          <g clipPath={`url(#frame-${id})`}>
+            <rect
+              className="dl-mark-gleam"
+              x="-160"
+              y="0"
+              width="120"
+              height="320"
+              fill={`url(#gleam-${id})`}
+              transform="skewX(-20)"
+            />
+          </g>
+        )}
       </g>
-      <g className="tf-logo-lens" fill="none" stroke="#3DD6A8" strokeLinecap="round">
-        <circle cx="28" cy="28" r="18" strokeWidth="4" />
-        <path d="M41.5 41.5 53 53" strokeWidth="6" />
-      </g>
+
+      {LENSES.map(([cx, cy], i) => (
+        <g key={i} clipPath={`url(#lens${i}-${id})`}>
+          {/* Faint glass, only visible while scanning. */}
+          <circle className="dl-mark-glass" cx={cx} cy={cy} r={LENS_R} />
+          <g className={`dl-mark-glint dl-mark-glint-${i}`} style={{ transformOrigin: `${cx}px ${cy}px` }}>
+            <path
+              d={MARK_GLINT}
+              fillRule="evenodd"
+              fill={mono ? "currentColor" : "hsl(var(--brand-grey))"}
+              opacity={mono ? 0.55 : 1}
+            />
+          </g>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** "dentaloupe" set in the logo's own lettering. */
+export function Wordmark({ className, tone = "brand", title = "Dentaloupe" }) {
+  const mono = tone === "mono";
+  return (
+    <svg viewBox={WORD_VIEWBOX} role="img" aria-label={title} className={cn("dl-word shrink-0", className)}>
+      <path d={WORD_NAVY} fillRule="evenodd" fill={mono ? "currentColor" : "hsl(var(--brand-navy))"} />
+      <path d={WORD_GREY} fillRule="evenodd" fill={mono ? "currentColor" : "hsl(var(--brand-grey))"} opacity={mono ? 0.6 : 1} />
     </svg>
   );
 }
 
 /** Mark + wordmark, for page headers. */
-export function Logo({ className, markClassName, animated = false }) {
+export function Logo({ className, markClassName, motion = "idle" }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <LogoMark animated={animated} className={cn("h-8 w-8", markClassName)} />
-      <span className="flex flex-col leading-tight">
-        <span className="text-[15px] font-semibold tracking-tight">
-          Dentaloupe<span className="text-[hsl(var(--brand-green))]">-XAI</span>
+    <span className={cn("dl-logo group inline-flex items-center gap-2.5", className)}>
+      <LogoMark motion={motion} className={cn("h-8 w-auto", markClassName)} title="" />
+      <span className="flex flex-col gap-[3px] leading-none">
+        <Wordmark className="h-[15px] w-auto" title="Dentaloupe-XAI" />
+        <span className="text-[9.5px] font-medium tracking-wide text-muted-foreground">
+          <span className="font-semibold text-[hsl(var(--brand-navy))]">XAI</span> · by NAIA
         </span>
-        <span className="text-[10px] font-medium text-muted-foreground">by NAIA</span>
       </span>
     </span>
+  );
+}
+
+/**
+ * The mark as a faint silhouette behind content (dr Gilang: copies and screenshots of the
+ * white pages should carry the brand). Purely decorative, never intercepts a tap.
+ */
+export function LogoWatermark({ className }) {
+  return (
+    <LogoMark
+      tone="mono"
+      motion="static"
+      title=""
+      className={cn("pointer-events-none select-none text-[hsl(var(--brand-navy))]", className)}
+    />
   );
 }
